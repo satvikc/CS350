@@ -7,6 +7,6 @@ fun {Fib (X|XS) N}
    end
 end
 fun {Fibonacci N}
-   {Fib [1 1] N-1}
+   {Reverse {Fib [1 1] N-1}}
 end
-{Browse {Fibonacci 10}}
+{Browse {Fibonacci 20}}

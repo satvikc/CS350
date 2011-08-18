@@ -10,10 +10,9 @@ fun {Filter F Ls}
    case Ls
    of nil then nil
    [] (X|XS) then
-      {if {F X} then X|{Filter F (XS)}
-       else {Filter F (XS)}
-       end
-       }
+      if {F X} then X|{Filter F (XS)}
+      else {Filter F (XS)}
+      end
    end
 end
 fun {Even N}
@@ -21,7 +20,7 @@ fun {Even N}
    else false
    end
 end
-% {Browse {Filter Even L}}
+{Browse {Filter Even L}}
 fun {By1 N}
    N+1
 end

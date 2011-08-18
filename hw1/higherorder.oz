@@ -38,6 +38,6 @@ fun {FoldR Ls F Z}
    end
 end
 {Browse {Map IntToFloat [1 2 3 4 5]}}
-{Browse {Filter Even L}}
+{Browse {Filter Even [1 2 3 4 5]}}
 {Browse {FoldL [1 2 3 4 5] Add 10}} 
 {Browse {FoldR [1 2 3 4 5] Add 10}}

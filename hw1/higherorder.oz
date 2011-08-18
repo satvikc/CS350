@@ -19,9 +19,6 @@ fun {Even N}
    else false
    end
 end
-fun {By1 N}
-   N+1
-end
 fun {Add X Y}
    X+Y
 end

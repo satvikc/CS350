@@ -31,13 +31,13 @@ fun {FoldL Ls F Z}
    [] (X|XS) then {FoldL (XS) F {F Z X}}
    end
 end
-fun {FoldR Ls F Z}
+fun {Fold_ Ls F Z}
    case Ls
    of nil then Z
-   [] (X|XS) then {F X {FoldR XS F Z}}
+   [] (X|XS) then {F X {Fold_ XS F Z}}
    end
 end
 {Browse {Map IntToFloat [1 2 3 4 5]}}
 {Browse {Filter Even [1 2 3 4 5]}}
 {Browse {FoldL [1 2 3 4 5] Add 10}} 
-{Browse {FoldR [1 2 3 4 5] Add 10}}
+{Browse {Fold_ [1 2 3 4 5] Add 10}}

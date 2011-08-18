@@ -5,7 +5,6 @@ fun {Map F Ls}
    [] (X|XS) then {F X}|{Map F (XS)}
    end
 end
-{Browse {Map IntToFloat [1 2 3 4 5]}}
 fun {Filter F Ls}
    case Ls
    of nil then nil
@@ -20,7 +19,6 @@ fun {Even N}
    else false
    end
 end
-{Browse {Filter Even L}}
 fun {By1 N}
    N+1
 end
@@ -33,11 +31,13 @@ fun {FoldL Ls F Z}
    [] (X|XS) then {FoldL (XS) F {F Z X}}
    end
 end
-{Browse {FoldL [1 2 3 4 5] Add 10}} 
 fun {FoldR Ls F Z}
    case Ls
    of nil then Z
    [] (X|XS) then {F X {FoldR XS F Z}}
    end
 end
+{Browse {Map IntToFloat [1 2 3 4 5]}}
+{Browse {Filter Even L}}
+{Browse {FoldL [1 2 3 4 5] Add 10}} 
 {Browse {FoldR [1 2 3 4 5] Add 10}}

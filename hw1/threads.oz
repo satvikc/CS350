@@ -1,5 +1,5 @@
-declare L S
-fun lazy {RandomNumberGenerator}
+declare L S Average
+fun lazy {RandomNumberGenerator} % Function to generate infinite list of random binary digits 
       {OS.rand} mod 2 | {RandomNumberGenerator}
 end
 fun {Add X Y} % Dummy function to add two numbers 
@@ -7,15 +7,17 @@ fun {Add X Y} % Dummy function to add two numbers
 end
 fun {Main Count}
    thread
-      L = {RandomNumberGenerator}
+      S = {FoldL {List.take L Count} Add 0} % Summing up in the other thread
+      Average = {IntToFloat S}/{IntToFloat Count} % average
+      
    end
    thread
-      S = {FoldL {List.take L Count} Add 0}
-      {Browse {List.take L Count}}
-      %{Browse {IntToFloat S}/{IntToFloat Count}}
+      L = {RandomNumberGenerator} % Generating the list in a new thread
    end
+   {Browse {List.take L Count}} % list of first count number of elements of the list
+   Average 
 end
-{Main 5}
+{Browse {Main 5}}
    
 
 

@@ -17,9 +17,15 @@ end
 %{Browse {Dictionary.member @A 2}}
 proc {BindValueToKeyInSAS Key Val}
    if {Dictionary.member @A Key} then
-      {Raise alreadyAssigned(Key Val {Dictionary.get @A Key})}
+      if {Dictionary.get @A Key}==unbound
+      then
+         {Dictionary.put @A Key Val}
+         %{BindAll equivalence
+      else
+         {Raise alreadyAssigned(Key Val {Dictionary.get @A Key})}
+      end
    else
-      {Dictionary.put @A Key Val}
+      {Raise keyDoesNotExist(Key)}
    end
 end
 fun {GetToRoot Key}
@@ -53,7 +59,7 @@ fun {RetrieveFromSAS Key}
          end
       end
    else
-      nil
+      raise missingKey(Key) end
    end
 end
 %{Test @E}

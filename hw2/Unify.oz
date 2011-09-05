@@ -36,6 +36,7 @@ end
 proc {Unify Expression1 Expression2 Environment}
   Expression1S = {SubstituteIdentifiers Expression1 Environment}
   Expression2S = {SubstituteIdentifiers Expression2 Environment}
+  %{Browse unifying(Expression1S Expression2S)}
 in
   {UnifySubstituted Expression1S Expression2S nil}
 end

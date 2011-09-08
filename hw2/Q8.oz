@@ -1,6 +1,7 @@
 \insert 'Unify.oz'
 declare O
 O = {NewCell nil}
+REnv = {NewCell FEnv}
 fun {CheckCompatible R1 R Env}
    local R2 = {RetrieveFromSAS Env.R} in
       case R1 of
@@ -54,11 +55,49 @@ proc {AddToEnv Env Env1 P Pold}
       {Raise notRecordcannotAdd(P)}
    end
 end
-proc {AddProcedureToSAS P OldEnv Ident}
-   local CE PValue in
-      CE = nil
-      PValue = P#CE
-      %{Unify Ident PValue }
+
+fun {RestrictEnvironment Env XS}
+   case XS
+   of H|T
+   then
+      if {Value.hasFeature Env H} == true
+      then
+	    REnv := {AdjoinAt @REnv H Env.H}
+	    {RestrictEnvironment Env T}
+      else
+	 nil
+      end
+   else
+      nil
+   end
+end
+proc {Subtract XS YS ?ZS}
+    ZS = {List.filter XS fun {$ X}  if {List.member X YS} then false else true end end}
+end
+fun {TupleFlatten XS}
+   local IS FS SN in
+      IS = {List.flatten XS}
+      {List.partition IS fun {$ X} case X of A#B then true else false end end FS SN}
+      if {List.length FS} > 0 then
+	 {List.append {TupleFlatten {List.map FS fun {$ X} case X of A#B then A|B|nil else nil end end}} SN}
+      else
+	 SN
+      end
+   end
+end
+proc {FindContextEnvironment P OldEnv ?CEnv}
+   case P of
+      subr|Tail
+   then
+      local FormalArgs ProcedureBody FlatList FreeList in
+	 FormalArgs = {List.map Tail.1 IdentExtracter}
+	 ProcedureBody = Tail.2
+	 FlatList = {List.map {List.filter {TupleFlatten ProcedureBody} fun {$ X} case X of ident(X) then true else false end end} IdentExtracter}
+	 FreeList = {Subtract FlatList FormalArgs}
+	 CEnv = {RestrictEnvironment OldEnv FreeList}
+      end
+   else
+      skip
    end
 end
 proc {ToTuple X Y ?R}
@@ -163,10 +202,11 @@ proc {Interpreter Stack}
 		  case B
 		  of ident(Variable)
 		  then
-		     %{Browse Env}
-		     %{AddProcedureToSAS C Env B}
-		     {Unify B C#nil Env}
-		     {Interpreter XS#{Dictionary.entries @A}}
+		     local CE in
+			%CE = {FindContextEnvironment C Env}
+			{Unify B C#Env Env}
+			{Interpreter XS#{Dictionary.entries @A}}
+		     end
 		  else
 		     skip
 		  end
@@ -208,9 +248,10 @@ Statement1 = [localvar ident(y) [[bind ident(y) literal(100)] [localvar ident(x)
 Statement = [localvar ident(z) [[bind ident(z) literal(true)] [conditional ident(z)#Statement1 [nop]]]]
 Statement2 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localvar ident(c) [[bind ident(max) [subr [ident(x) ident(y) ident(z)] [localvar ident(t) [[bind ident(t) literal(true)][conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [bind ident(b) literal(5)] [nop]]]]]]
 Statement4 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localvar ident(c) [[bind ident(max) [subr [ident(x) ident(y) ident(z)] [localvar ident(t) [[bind ident(t) literal(false)][conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [bind ident(b) literal(5)] [apply ident(max) ident(a) ident(b) ident(c)]]]]]]
+Statement5 = [localvar ident(lowerBound) [localvar ident(a) [localvar ident(y) [localvar ident(c) [[bind ident(y) literal(5)] [bind ident(lowerBound) [subr [ident(x)  ident(z)] [localvar ident(t) [[bind ident(t) literal(true)] [conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [apply ident(lowerBound) ident(a) ident(c)]]]]]]
 Statement3 = [localvar ident(p) [bind ident(p) [subr [ident(x)] [[nop]]]]]
 Environment = env()
-Input = '#'(['#'(Statement4 Environment)] nil)
+Input = '#'(['#'(Statement5 Environment)] nil)
 {Interpreter Input}
 proc {PrettyPrinter L}
    case L of

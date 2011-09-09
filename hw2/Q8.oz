@@ -1,5 +1,5 @@
 \insert 'Unify.oz'
-declare O
+declare O REnv FEnv
 O = {NewCell nil}
 REnv = {NewCell FEnv}
 fun {CheckCompatible R1 R Env}
@@ -27,11 +27,11 @@ end
 proc {FindValue Rec Key Ret}
    case Rec of
       nil then raise keyNotFound(Rec Key) end
-   [] X|XS then if X.1 == Key then case X.2.1 of literal(A)
+   [] X|XS then if X.1 == Key then case X.2.1 of A
 				   then
 				      local K in
 					 K = {AddKeyToSAS}
-					 {BindValueToKeyInSAS K literal(A) }
+					 {BindValueToKeyInSAS K A}
 					 Ret = K
 				      end
 				   end
@@ -46,7 +46,7 @@ proc {AddToEnv Env Env1 P Pold}
 	 record|RecLabel1|RecContent1|nil
       then
 	 local L in 
-	    L = {List.map RecContent fun {$ Pair} Pair.2.1#{FindValue RecContent1 Pair.1} end}
+	    L = {List.map RecContent fun {$ Pair} case Pair.2.1 of ident(A) then A#{FindValue RecContent1 Pair.1} end end}
 	    {AdjoinList Env L Env1}
 	    {Browse Env1}
 	 end
@@ -55,22 +55,21 @@ proc {AddToEnv Env Env1 P Pold}
       {Raise notRecordcannotAdd(P)}
    end
 end
-
 fun {RestrictEnvironment Env XS}
-   case XS
-   of H|T
-   then
-      if {Value.hasFeature Env H} == true
-      then
-	    REnv := {AdjoinAt @REnv H Env.H}
-	    {RestrictEnvironment Env T}
-      else
-	 nil
-      end
-   else
-      nil
-   end
-end
+     case XS
+     of H|T
+     then
+        if {Value.hasFeature Env H} == true
+        then
+  	    REnv := {AdjoinAt @REnv H Env.H}
+  	    {RestrictEnvironment Env T}
+        else
+  	 nil
+        end
+     else
+        nil
+     end
+  end
 proc {Subtract XS YS ?ZS}
     ZS = {List.filter XS fun {$ X}  if {List.member X YS} then false else true end end}
 end
@@ -244,14 +243,16 @@ proc {Interpreter Stack}
 end   
 %Statement = [cond [nop] [nop] [nop]]
 %Statement1 = [localvar ident(x) [[localvar ident(y) [[localvar ident(x) [[bind ident(x) ident(y)] [bind ident(x) literal(35)] [bind ident(y) literal(35)]]] [bind ident(y) literal(35)]]]]]
-Statement1 = [localvar ident(y) [[bind ident(y) literal(100)] [localvar ident(x) [[bind ident(x) [record literal(rec) [[literal(f1) ident(y)] [literal(f2) literal(1002)]]]] [match ident(x) [record literal(rec) [[literal(f1) a] [literal(f2) b]]]#[bind ident(a)  ident(y)] [nop]]]]]]
+Statement1 = [[nop] [nop] [nop]]
+Statement2 = [localvar ident(y) [[bind ident(y) literal(100)] [localvar ident(x) [[bind ident(x) [record literal(rec) [[literal(f1) ident(y)] [literal(f2) literal(1002)]]]] [match ident(x) [record literal(rec) [[literal(f1) ident(a)] [literal(f2) ident(b)]]]#[bind ident(a)  ident(y)] [nop]]]]]]
 Statement = [localvar ident(z) [[bind ident(z) literal(true)] [conditional ident(z)#Statement1 [nop]]]]
-Statement2 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localvar ident(c) [[bind ident(max) [subr [ident(x) ident(y) ident(z)] [localvar ident(t) [[bind ident(t) literal(true)][conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [bind ident(b) literal(5)] [nop]]]]]]
+%Statement2 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localvar ident(c) [[bind ident(max) [subr [ident(x) ident(y) ident(z)] [localvar ident(t) [[bind ident(t) literal(true)][conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [bind ident(b) literal(5)] [nop]]]]]]
 Statement4 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localvar ident(c) [[bind ident(max) [subr [ident(x) ident(y) ident(z)] [localvar ident(t) [[bind ident(t) literal(false)][conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [bind ident(b) literal(5)] [apply ident(max) ident(a) ident(b) ident(c)]]]]]]
 Statement5 = [localvar ident(lowerBound) [localvar ident(a) [localvar ident(y) [localvar ident(c) [[bind ident(y) literal(5)] [bind ident(lowerBound) [subr [ident(x)  ident(z)] [localvar ident(t) [[bind ident(t) literal(true)] [conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [apply ident(lowerBound) ident(a) ident(c)]]]]]]
 Statement3 = [localvar ident(p) [bind ident(p) [subr [ident(x)] [[nop]]]]]
 Environment = env()
-Input = '#'(['#'(Statement5 Environment)] nil)
+Statement6 = [localvar ident(x) [localvar ident(y) [localvar ident(z) [[bind ident(x) [record literal(p) [[literal(f1) ident(y)] [literal(f2) ident(z)]]]] [bind ident(x) [record literal(p) [[literal(f1) literal(2)] [literal(f2) literal(3)]]]]]]]] 
+Input = '#'(['#'(Statement2  Environment)] nil)
 {Interpreter Input}
 proc {PrettyPrinter L}
    case L of

@@ -251,8 +251,16 @@ Statement4 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localva
 Statement5 = [localvar ident(lowerBound) [localvar ident(a) [localvar ident(y) [localvar ident(c) [[bind ident(y) literal(5)] [bind ident(lowerBound) [subr [ident(x)  ident(z)] [localvar ident(t) [[bind ident(t) literal(true)] [conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [apply ident(lowerBound) ident(a) ident(c)]]]]]]
 Statement3 = [localvar ident(p) [bind ident(p) [subr [ident(x)] [[nop]]]]]
 Environment = env()
-Statement6 = [localvar ident(x) [localvar ident(y) [localvar ident(z) [[bind ident(x) [record literal(p) [[literal(f1) ident(y)] [literal(f2) ident(z)]]]] [bind ident(x) [record literal(p) [[literal(f1) literal(2)] [literal(f2) literal(3)]]]]]]]] 
-Input = '#'(['#'(Statement2  Environment)] nil)
+Statement6 = [localvar ident(x) [localvar ident(y) [localvar ident(z) [[bind ident(x) [record literal(p) [[literal(f1) ident(y)] [literal(f2) ident(z)]]]] [bind ident(x) [record literal(p) [[literal(f1) literal(2)] [literal(f2) literal(3)]]]]]]]]
+Statement7 = [localvar ident(foo)
+	      [localvar ident(bar)
+	       [localvar ident(quux)
+		[[bind ident(bar) [subr [ident(baz)]
+		  [bind [record literal(person) [[literal(age) ident(foo)]]] ident(baz)]]]
+		 [apply ident(bar) ident(quux)]
+		 [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
+		 [bind literal(42) ident(foo)]]]]]
+Input = '#'(['#'(Statement7  Environment)] nil)
 {Interpreter Input}
 proc {PrettyPrinter L}
    case L of

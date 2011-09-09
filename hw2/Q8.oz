@@ -290,6 +290,16 @@ StatementMatchMultiple =[localvar ident(foo)
       [bind ident(result) literal(25)]]]]]]
 Input = '#'(['#'(StatementMatchFail  Environment)] nil)
 %{Interpreter Input}
+Statement7 = [localvar ident(foo)
+	      [localvar ident(bar)
+	       [localvar ident(quux)
+		[[bind ident(bar) [subr [ident(baz)]
+		  [bind [record literal(person) [[literal(age) ident(foo)]]] ident(baz)]]]
+		 [apply ident(bar) ident(quux)]
+		 [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
+		 [bind literal(42) ident(foo)]]]]]
+Input = '#'(['#'(Statement7  Environment)] nil)
+{Interpreter Input}
 proc {PrettyPrinter L}
    case L of
       nil then skip

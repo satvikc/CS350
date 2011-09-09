@@ -291,16 +291,14 @@ StatementMatchMultiple =[localvar ident(foo)
       %% Check
       [bind ident(result) literal(25)]]]]]]
 StatementProc = [localvar ident(foo)
-    [localvar ident(bar)
-     [localvar ident(quux)
-      [[bind ident(bar) [subr [ident(baz)]
-        [bind [record literal(person) [[literal(age) ident(foo)]]] ident(baz)]]]
-       [apply ident(bar) ident(quux)]
-       [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
-       %% We'll check whether foo has been assigned the value by
-       %% raising an exception here
-       [bind literal(42) ident(foo)]]]]]
-Input = '#'(['#'(StatementMatch  Environment)] nil)
+  [localvar ident(bar)
+[localvar ident(quux)
+  [[bind ident(bar) [subr [ident(baz)]
+  [bind [record literal(person) [[literal(age) ident(foo)]]] ident(baz)]]]
+  [apply ident(bar) ident(quux)]
+  [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
+  [bind literal(42) ident(foo)]]]]]
+Input = '#'(['#'(StatementProc  Environment)] nil)
 {Interpreter Input}
 proc {PrettyPrinter L}
    case L of

@@ -20,7 +20,7 @@ fun {CheckCompatible R1 R Env}
 	    raise notRecord1(R2) end
 	 end
       else
-	 raise notRecord2(R1) end
+	 false
       end
    end
 end
@@ -251,9 +251,45 @@ Statement4 = [localvar ident(max) [localvar ident(a) [localvar ident(b) [localva
 Statement5 = [localvar ident(lowerBound) [localvar ident(a) [localvar ident(y) [localvar ident(c) [[bind ident(y) literal(5)] [bind ident(lowerBound) [subr [ident(x)  ident(z)] [localvar ident(t) [[bind ident(t) literal(true)] [conditional ident(t)#[bind ident(z) ident(x)] [bind ident(z) ident(y)]]]]]] [bind ident(a) literal(3)] [apply ident(lowerBound) ident(a) ident(c)]]]]]]
 Statement3 = [localvar ident(p) [bind ident(p) [subr [ident(x)] [[nop]]]]]
 Environment = env()
-Statement6 = [localvar ident(x) [localvar ident(y) [localvar ident(z) [[bind ident(x) [record literal(p) [[literal(f1) ident(y)] [literal(f2) ident(z)]]]] [bind ident(x) [record literal(p) [[literal(f1) literal(2)] [literal(f2) literal(3)]]]]]]]] 
-Input = '#'(['#'(Statement2  Environment)] nil)
-{Interpreter Input}
+Statement6 = [localvar ident(x) [localvar ident(y) [localvar ident(z) [[bind ident(x) [record literal(p) [[literal(f1) ident(y)] [literal(f2) ident(z)]]]] [bind ident(x) [record literal(p) [[literal(f1) literal(2)] [literal(f2) literal(3)]]]]]]]]
+%testcases provided
+StatementCycle = [localvar ident(foo) [localvar ident(bar) [[bind ident(foo) [record literal(person) [[literal(name) ident(bar)]]]] [bind ident(bar) [record literal(person) [[literal(name) ident(foo)]]]] [bind ident(foo) ident(bar)]]]]
+StatementMatch = [localvar ident(foo) [localvar ident(result) [[bind ident(foo) [record literal(bar) [[literal(baz) literal(42)] [literal(quux) literal(314)]]]] [match ident(foo) [record literal(bar) [[literal(baz) ident(fortytwo)] [literal(quux) ident(pitimes100)]]]#[bind ident(result) ident(fortytwo)] [[bind ident(result) literal(314)]]] [bind ident(result) literal(42)]]]]
+StatementIf =  [localvar ident(foo)
+  [localvar ident(result)
+   [[bind ident(foo) literal(true)]
+    [conditional ident(foo)#[bind ident(result) literal(t)] [bind ident(result) literal(f)]]
+    [bind ident(result) literal(t)]]]]
+StatementIfFail =  [localvar ident(foo)
+  [localvar ident(result)
+   [[bind ident(foo) literal(false)]
+    [conditional ident(foo)#[bind ident(result) literal(t)]
+     [bind ident(result) literal(f)]]
+    %% Check
+    [bind ident(result) literal(f)]]]]
+StatementMatchFail = [localvar ident(foo)
+  [localvar ident(bar)
+   [localvar ident(baz)
+    [[bind ident(foo) ident(bar)]
+     [bind literal(20) ident(bar)]
+     [match ident(foo) literal(21)#[bind ident(baz) literal(t)]
+      [bind ident(baz) literal(f)]]
+     %% Check
+     [bind ident(baz) literal(f)]
+     [nop]]]]]
+StatementMatchMultiple =[localvar ident(foo)
+  [localvar ident(bar)
+   [localvar ident(baz)
+    [localvar ident(result)
+     [[bind ident(foo) literal(person)]
+      [bind ident(bar) literal(age)]
+      [bind ident(baz) [record literal(person) [[literal(age) literal(25)]]]]
+      [match ident(baz) [record ident(foo) [[ident(bar) ident(quux)]]]#[bind ident(result) ident(quux)]
+       [bind ident(result) literal(f)]]
+      %% Check
+      [bind ident(result) literal(25)]]]]]]
+Input = '#'(['#'(StatementMatchFail  Environment)] nil)
+%{Interpreter Input}
 proc {PrettyPrinter L}
    case L of
       nil then skip
@@ -263,4 +299,4 @@ proc {PrettyPrinter L}
    end
 end
 {PrettyPrinter {Reverse @O}}
-
+%{Browse {Unify literal(1) literal(1)}}

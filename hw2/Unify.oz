@@ -84,11 +84,11 @@ proc {UnifyInternal Expression1 Expression2 UnificationsDone}
       else
         {Raise incompatibleTypes(Expression1 Expression2)}
       end
-    [] record|Record1Label|Record1FeaturePairs then
+    [] record|Record1Label|Record1FeaturePairs|nil then
       %% Again, Expression2 is not an identifier. It has to be a literal
       %% or a record.
       case Expression2
-      of record|Record2Label|Record2FeaturePairs then
+      of record|Record2Label|Record2FeaturePairs|nil then
         %% The record labels have to be the same, and so do the feature
         %% pairs.
         if Record1Label == Record2Label andthen {IsAritySame Record1FeaturePairs

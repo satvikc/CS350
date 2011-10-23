@@ -138,29 +138,29 @@ proc {Interpreter Stack}
 	    [] [nop]|nil
 	    then
 	       {Interpreter XS#{Dictionary.entries @A}#{Dictionary.entries @B}}
-	    [] match|B|P#S|D|nil
+	    [] match|B1|P#S|D|nil
 	    then
                local Env1 in
                   Env1 = {FlattenAndAdd P|nil Env}
                   try
-                     {Unify B P Env1}
+                     {Unify B1 P Env1}
                      {Interpreter '#'(S#Env1|XS {Dictionary.entries @A} {Dictionary.entries @B})}
                   catch Exc
                      then {Interpreter '#'(D#Env|XS {Dictionary.entries @A} {Dictionary.entries @B})}
                   end
                end             
-	    [] conditional|B|D|nil
+	    [] conditional|B1|D|nil
 	    then
-	       case B of
+	       case B1 of
 		  ident(Cond)#T
 	       then
 		  local C in
 		     C = {RetrieveFromSAS Env.Cond}
 		     if C==literal(true)
-		     then {Interpreter '#'(T#Env|XS {Dictionary.entries @A})}
+		     then {Interpreter '#'(T#Env|XS {Dictionary.entries @A} {Dictionary.entries @B})}
 		     else if C==literal(false)
 			  then
-			     {Interpreter '#'(D#Env|XS {Dictionary.entries @A})}
+			     {Interpreter '#'(D#Env|XS {Dictionary.entries @A} {Dictionary.entries @B})}
 			  else
 			     {Raise notConditional(Cond C)}
 			  end
@@ -206,7 +206,7 @@ proc {Interpreter Stack}
 		     local CE in
 			%CE = {FindContextEnvironment C Env}
 			{Unify B1 C#Env Env}
-			{Interpreter XS#{Dictionary.entries @A}}
+			{Interpreter XS#{Dictionary.entries @A}#{Dictionary.entries @B}}
 		     end
 		  else
 		     skip
@@ -298,7 +298,7 @@ StatementProc = [localvar ident(foo)
   [apply ident(bar) ident(quux)]
   [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
   [bind literal(42) ident(foo)]]]]]
-Input = '#'(['#'(Statement1  Environment)] nil nil)
+Input = '#'(['#'(Statement6  Environment)] nil nil)
 %%Input = [(Statement1#Environment)]#nil
 {Interpreter Input}
 proc {PrettyPrinter L}

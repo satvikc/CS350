@@ -195,6 +195,22 @@ proc {Interpreter Stack}
 		  {Raise notAProcedure(F SubRoutine)}
 		  end
 	       end
+	    [] byneed|B1|C|nil
+	    then
+	       case B1
+	       of ident(Procedure)
+	       then
+		  case C
+		  of ident(Variable)
+		  then
+		     {Dictionary.put @B Env.Variable Env.Procedure}
+		     {Interpreter XS#{Dictionary.entries @A}#{Dictionary.entries @B}}
+		  else
+		     skip
+		  end
+	       else
+		  skip
+	       end	
 	    [] bind|B1|C|nil
 	    then
 	       case C
@@ -297,8 +313,9 @@ StatementProc = [localvar ident(foo)
   [bind [record literal(person) [[literal(age) ident(foo)]]] ident(baz)]]]
   [apply ident(bar) ident(quux)]
   [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
-  [bind literal(42) ident(foo)]]]]]
-Input = '#'(['#'(Statement6  Environment)] nil nil)
+   [bind literal(42) ident(foo)]]]]]
+StatementNeed =[localvar ident(foo) [localvar ident(p) [[byneed ident(p) ident(foo)]]]]
+Input = '#'(['#'(StatementNeed  Environment)] nil nil)
 %%Input = [(Statement1#Environment)]#nil
 {Interpreter Input}
 proc {PrettyPrinter L}

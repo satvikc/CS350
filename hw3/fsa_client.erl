@@ -1,20 +1,32 @@
--module(fsa).
+-module(fsa_client).
 -export([is_accepted/1,results/1,accept/2]).
 
-%%Finite state automaton with 3 states accept,reject,trap.
-automata(State,[]) -> 
-    State;
-automata(State,[Head|Tail]) -> 
-    case Head of
-        a when State==accept -> automata(reject,Tail);
-        b when State==reject -> automata(accept,Tail);
-        _ -> trap
+%% Explanation given with is_accepted function 
+check_accepted(P,[]) -> 
+    P ! {self(),leave},
+    receive
+        {final,Msg} -> 
+            c:flush(),
+            Msg
+    end;
+check_accepted(_,[Head|Tail])->
+    receive
+        {PID,Msg} ->
+            io:format("clien message : ~p~n",[Msg]),
+            PID ! {self(),Head},
+            io:format("check accepted with : ~p~n",[Tail]),
+            check_accepted(PID,Tail)
     end.
 
-%%Function to call finite state automata and return true if accepted and false otherwise
+%%Function as given in the question . return false if the list is empty.
+%%Otherwise sends join to the server which spawns a dedicated process for it 
+%%and then calls check_accepted which sends each element of the list one by one to the
+%%spawned dedicated process and finally sends leave to leave the process
+
 is_accepted([])-> false;
-is_accepted(List)->
-    accept==automata(accept,List).
+is_accepted(List)-> 
+    automata_server ! {self(),join},
+    check_accepted(self(),List).
 
 %%Helper function which sends the result (to process with pid Pid) of calling is_accepted on the argument X.
 accept(Pid,X) ->
@@ -38,3 +50,4 @@ result(List,_)->
 %%Final results function which call result with default arguments
 results(List) ->
     result(List,[]).
+

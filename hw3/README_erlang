@@ -1,0 +1,10 @@
+do first 
+>c(fsa_server).
+>c(fsa_client).
+>fsa_server:start().
+
+Not to check if a list (eg [a,b,a,b]) is accepted or not do 
+>fsa_client:is_accepted([a,b,a,b]).
+
+To check multiple lists.
+>fsa_client:results([[a],[a,b],[a,a,b],[],[a,b,a,b]]).

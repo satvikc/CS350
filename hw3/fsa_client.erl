@@ -44,7 +44,7 @@ result([],[Pid|Pids])->
     end;
 result(List,_)->
     Pid=self(),
-    Pids = [spawn(fsa,accept,[Pid,X]) || X <- List],
+    Pids = [spawn(fsa_client,accept,[Pid,X]) || X <- List],
     result([],Pids).
 
 %%Final results function which call result with default arguments

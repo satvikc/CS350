@@ -198,13 +198,19 @@ proc {Interpreter Stack}
 	    [] byneed|B1|C|nil
 	    then
 	       case B1
-	       of ident(Procedure)
+	       of subr(Procedure)
 	       then
 		  case C
 		  of ident(Variable)
 		  then
-		     {Dictionary.put @B Env.Variable Env.Procedure}
-		     {Interpreter XS#{Dictionary.entries @A}#{Dictionary.entries @B}}
+		     case {Dictionary.get @A Env.Variable}
+		     of unbound
+		     then
+			{Dictionary.put @B Env.Variable Env.Procedure}
+			{Interpreter XS#{Dictionary.entries @A}#{Dictionary.entries @B}}
+		     else
+			skip
+		     end
 		  else
 		     skip
 		  end
@@ -314,7 +320,7 @@ StatementProc = [localvar ident(foo)
   [apply ident(bar) ident(quux)]
   [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
    [bind literal(42) ident(foo)]]]]]
-StatementNeed =[localvar ident(foo) [localvar ident(p) [[byneed ident(p) ident(foo)]]]]
+StatementNeed =[localvar ident(foo) [localvar ident(p) [[byneed subr(p) ident(foo)]]]]
 Input = '#'(['#'(StatementNeed  Environment)] nil nil)
 %%Input = [(Statement1#Environment)]#nil
 {Interpreter Input}

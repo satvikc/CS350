@@ -16,5 +16,5 @@ in
 end
 %% If any message M matches any of the patterns i.e Patterni , the corresponding Bodyi is executed ans the value of Sout is Sin#M else Sout = Sin
 %% If no message mathces any pattern , Loop blocks waiting for any incoming message to match a pattern.
-
+%% DiffList T#T is used to take care of the receive inside Bodyi
 	    

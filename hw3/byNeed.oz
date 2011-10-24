@@ -209,7 +209,10 @@ proc {Interpreter Stack}
 			{Dictionary.put @B Env.Variable Env.Procedure}
 			{Interpreter XS#{Dictionary.entries @A}#{Dictionary.entries @B}}
 		     else
-			skip
+			local S in
+			   S = [apply ident(Procedure) ident(Variable)]
+			   {Interpreter '#'(S#Env|XS {Dictionary.entries @A} {Dictionary.entries @B})}
+			end
 		     end
 		  else
 		     skip
@@ -320,8 +323,9 @@ StatementProc = [localvar ident(foo)
   [apply ident(bar) ident(quux)]
   [bind [record literal(person) [[literal(age) literal(40)]]] ident(quux)]
    [bind literal(42) ident(foo)]]]]]
-StatementNeed =[localvar ident(foo) [localvar ident(p) [[byneed subr(p) ident(foo)]]]]
-Input = '#'(['#'(StatementNeed  Environment)] nil nil)
+StatementNeedUnbound =[localvar ident(foo) [localvar ident(p) [[byneed subr(p) ident(foo)]]]]
+StatementNeedBound = [localvar ident(foo) [localvar ident(p) [[bind ident(foo) literal(42)] [bind ident(p) [subr [ident(x)] [nop]]] [nop] [nop] [byneed subr(p) ident(foo)] [nop] [nop]]]]
+Input = '#'(['#'(StatementNeedBound  Environment)] nil nil)
 %%Input = [(Statement1#Environment)]#nil
 {Interpreter Input}
 proc {PrettyPrinter L}

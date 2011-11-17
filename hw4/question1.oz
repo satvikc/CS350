@@ -26,7 +26,7 @@ local Wrap Unwrap
 in
    Port = port(newPort:NewPort send:Send)
 end
-declare S P R in
+declare S P in
 {Port.newPort S P}
 {Port.send P 10}
 {Port.send P 20}

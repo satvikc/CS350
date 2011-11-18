@@ -23,8 +23,8 @@ in
    Obj
 end
 {Browse Counter} %% To Show that the Counter class is a chunk
-C = {MyNew Counter init(0)}
-{C inc(2)}
-{C inc(2)}
-{C browse}
+C = {MyNew Counter init(0)} %% creates a object with the given init function
+{C inc(2)} %% Calls a method of the object 
+{C inc(2)} 
+{C browse} %% Should print 0+2+2 = 4 
       

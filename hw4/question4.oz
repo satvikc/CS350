@@ -16,6 +16,7 @@ in
    W=rec(view:View)
 end
 X={Newchunk anyrecord(a:label1 b:label2 c:label3)}
-{Browse {X.view a}}
+{Browse X} %% To Show that the fields of the record are secured 
+{Browse {X.view a}} %% Similar to call X.a for a record . Should display label1
    
       

@@ -28,8 +28,9 @@ in
 end
 declare S P in
 {Port.newPort S P}
+{Browse S}
 {Port.send P 10}
 {Port.send P 20}
-{Browse S}
+
 
       
